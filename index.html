@@ -1,0 +1,78 @@
+const category = document.getElementById('category').value;
+            
+            if(!name || !keywords){alert('Заполни название и ключевые слова!');return}
+            
+            const kw = keywords.split(',').map(k=>k.trim()).filter(k=>k);
+            const feat = features.split('\n').map(f=>f.trim()).filter(f=>f);
+            
+            // Templates
+            const templates = {
+                electronics:{benefits:['высокое качество','современные технологии'],emotions:['наслаждайтесь','оцените']},
+                clothes:{benefits:['комфорт','качественные материалы'],emotions:['выглядите','чувствуйте']},
+                home:{benefits:['функциональность','эргономика'],emotions:['создайте уют','облегчите быт']},
+                beauty:{benefits:['видимый результат','бережный уход'],emotions:['преобразитесь','позаботьтесь']},
+                kids:{benefits:['безопасность','развитие'],emotions:['радуйте детей','развивайтесь']},
+                auto:{benefits:['надежность','защита'],emotions:['защитите авто','улучшите']},
+                sport:{benefits:['производительность','комфорт'],emotions:['достигайте целей','тренируйтесь']},
+                other:{benefits:['качество','надежность'],emotions:['оцените','наслаждайтесь']}
+            };
+            
+            const t = templates[category] || templates.other;
+            
+            // Generate title
+            let title = name;
+            if(kw.length >= 2) title = ${kw[0]} ${kw[1]}.substring(0,60);
+            
+            // Generate WB description
+            let wb = ${title} — отличный выбор для тех, кто ценит ${t.benefits[0]}. ;
+            wb += ${t.emotions[0]} с этим товаром каждый день. ;
+            if(kw.length > 0) wb += Подходит для: ${kw.slice(0,4).join(', ')}. ;
+            if(feat.length > 0){
+                wb += \n\nОсновные характеристики:\n;
+                feat.forEach(f=> wb += • ${f.replace(/^[•\-]\s*/,'')}\n);
+            }
+            wb += \n\n✅ Официальный товар\n✅ Быстрая доставка по всей России\n✅ Гарантия качества\n✅ Возврат 14 дней\n\nЗаказывайте прямо сейчас!;
+            
+            // Generate Ozon HTML
+            let ozon = <b>${title}</b>\n\n;
+            ozon += Отличный выбор для ${t.emotions[0]}.\n\n;
+            if(feat.length > 0){
+                ozon += <b>Характеристики:</b>\n<ul>\n;
+                feat.forEach(f=> ozon += <li>${f.replace(/^[•\-]\s*/,'')}</li>\n);
+                ozon += </ul>\n\n;
+            }
+            ozon += <b>Преимущества:</b>\n<ul>\n<li>${t.benefits[0].charAt(0).toUpperCase()+t.benefits[0].slice(1)}</li>\n<li>Современный дизайн</li>\n<li>Долговечность</li>\n</ul>\n\n<b>Закажите сейчас!</b>;
+            
+            // Bullets
+            const bullets = feat.map(f=>• ${f.replace(/^[•\-]\s*/,'')}).join('\n') || • ${t.benefits[0]}\n• Современный дизайн\n• Долговечность;
+            
+            // Calculate score
+            let score = 7;
+            if(kw.length >= 3) score += 0.5;
+            if(kw.length >= 5) score += 0.5;
+            if(feat.length >= 3) score += 0.5;
+            if(title.length <= 60) score += 0.5;
+            score = Math.min(10, score);
+            
+            // Display
+            document.getElementById('score').textContent = score.toFixed(1);
+            document.getElementById('res-title').textContent = title;
+            document.getElementById('res-wb').textContent = wb;
+            document.getElementById('res-ozon').textContent = ozon;
+            document.getElementById('res-bullets').textContent = bullets;
+            document.getElementById('results').classList.add('show');
+            
+            // Save stats
+            totalGen++;
+            localStorage.setItem('gen', totalGen);
+            document.getElementById('stat-gen').textContent = totalGen;
+        }
+        
+        function copy(id){
+            const text = document.getElementById(id).textContent;
+            navigator.clipboard.writeText(text);
+            alert('Скопировано!');
+        }
+    </script>
+</body>
+</html>
